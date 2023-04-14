@@ -1,10 +1,15 @@
 import './style.css'
 import * as THREE from 'three';
-import gsap from 'gsap';
+// import gsap from 'gsap';
 
-console.log(gsap);
-
-
+const cursor = {
+    x:0,
+    y:0,
+}
+window.addEventListener('mousemove', (event)=> {
+    cursor.x = event.clientX / sizes.width - 0.5;
+    cursor.y = -(event.clientY / sizes.height - 0.5);
+})
 
 // Scene
 const scene = new THREE.Scene()
@@ -29,65 +34,61 @@ const sizes = {
     height: 600,
 }
 
+const aspectRatio = sizes.width/sizes.height;
+
 // Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-// camera.position.x = 1
-// camera.position.y = 1
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100 )
+// const camera = new THREE.OrthographicCamera(
+//     -1 * aspectRatio,
+//     1 * aspectRatio,
+//     1,
+//     -1,
+//     0.1,100)
+// camera.position.x = 2
+// camera.position.y = 2
 camera.position.z = 3
+console.log(camera.position.length());
 
 // look at the object , focus on object
-// camera.lookAt(mesh.position)
+camera.lookAt(mesh.position)
 
 // distance from camera
 // console.log(mesh.position.distanceTo(camera.position));
 scene.add(camera)
 
+
+const canvas = document.querySelector('canvas.webgl');
 // Renderer
 const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('canvas.webgl')
+    canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
 
+// render
+renderer.render(scene, camera)
+
+
 const clock = new THREE.Clock();
-
-gsap.to(mesh.position, {
-    x:2,
-    duration: 1,
-    delay: 1
-})
-gsap.to(mesh.position, {
-    x:-2,
-    duration: 1,
-    delay: 2
-})
-
 
 const tick = ()=> {
     
-//     const elapsedTime = clock.getElapsedTime();
-//     // console.log(elapsedTime);
+    const elapsedTime = clock.getElapsedTime();
+    // mesh.rotation.y = elapsedTime * Math.PI  ;
+    // console.log(cursor)
 
-//     mesh.position.y = Math.sin(elapsedTime) ;
-//     mesh.position.x = Math.cos(elapsedTime) ;
+    // render
+    console.log(cursor.x)
+    camera.position.x = Math.sin(cursor.x * 2) ;
+    camera.position.Z = Math.cos(cursor.x * 2);
+    // camera.position.y = cursor.y * 5;
+    camera.lookAt(mesh.position)
 
-//     // camera.position.y = Math.sin(elapsedTime) ;
-//     // camera.position.x = Math.cos(elapsedTime) ;
-//     // camera.lookAt(mesh.position)
-
-//     // one rotation per second
-//     // mesh.rotation.y = elapsedTime * Math.PI * 2 ;
-
-//     // render
     renderer.render(scene, camera)
 
     window.requestAnimationFrame(tick);
 
 }
 tick()
-
-
-
-
 
 
 // Object
@@ -161,6 +162,43 @@ tick()
 //     mesh.rotation.x += 0.001 * deltaTime
 
 //     // render
+//     renderer.render(scene, camera)
+
+//     window.requestAnimationFrame(tick);
+
+// }
+// tick()
+
+// const clock = new THREE.Clock();
+
+// gsap.to(mesh.position, {
+//     x:2,
+//     duration: 1,
+//     delay: 1
+// })
+// gsap.to(mesh.position, {
+//     x:-2,
+//     duration: 1,
+//     delay: 2
+// })
+
+
+// const tick = ()=> {
+    
+// //     const elapsedTime = clock.getElapsedTime();
+// //     // console.log(elapsedTime);
+
+// //     mesh.position.y = Math.sin(elapsgitedTime) ;
+// //     mesh.position.x = Math.cos(elapsedTime) ;
+
+// //     // camera.position.y = Math.sin(elapsedTime) ;
+// //     // camera.position.x = Math.cos(elapsedTime) ;
+// //     // camera.lookAt(mesh.position)
+
+// //     // one rotation per second
+// //     // mesh.rotation.y = elapsedTime * Math.PI * 2 ;
+
+// //     // render
 //     renderer.render(scene, camera)
 
 //     window.requestAnimationFrame(tick);
