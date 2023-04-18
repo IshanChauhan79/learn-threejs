@@ -25,15 +25,22 @@ window.addEventListener("mousemove", (event) => {
 const scene = new THREE.Scene();
 
 // Object
+const count = 50;
+const positionsArray = new Float32Array(count * 3);
+for (let i = 0; i < count * 3; i++) {
+  positionsArray[i] = Math.random() - 0.5;
+}
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+// const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute("position", positionsAttribute);
+const material = new THREE.MeshBasicMaterial({
+  color: 0xff0000,
+  wireframe: true,
+});
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
-
-// axesHelper
-const axesHelper = new THREE.AxesHelper(2);
-scene.add(axesHelper);
 
 const aspectRatio = sizes.width / sizes.height;
 
@@ -47,7 +54,6 @@ const camera = new THREE.PerspectiveCamera(
 // camera.position.x = 2;
 // camera.position.y = 2;
 camera.position.z = 3;
-console.log(camera.position.length());
 
 // look at the object , focus on object
 camera.lookAt(mesh.position);
@@ -57,9 +63,6 @@ scene.add(camera);
 // controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-// controls.enabled = false;
-// controls.target.y = 1;
-// controls.update();
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
@@ -84,7 +87,6 @@ window.addEventListener("resize", (event) => {
 
 // full screen mode - using double click
 window.addEventListener("dblclick", () => {
-  console.log("double click");
   if (!document.fullscreenElement) {
     console.log("Go full screen mode");
     canvas.requestFullscreen();
