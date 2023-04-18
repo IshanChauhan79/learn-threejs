@@ -1,6 +1,19 @@
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as dat from "dat.gui";
+import gsap from "gsap";
+
+// Debug --------
+const gui = new dat.GUI({ closed: true, width: 400 });
+
+const properties = {
+  color: 0xff0000,
+  spin: () =>
+    gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 }),
+};
+
+console.log(gui);
 
 // Sizes
 const sizes = {
@@ -25,22 +38,30 @@ window.addEventListener("mousemove", (event) => {
 const scene = new THREE.Scene();
 
 // Object
-const count = 50;
-const positionsArray = new Float32Array(count * 3);
-for (let i = 0; i < count * 3; i++) {
-  positionsArray[i] = Math.random() - 0.5;
-}
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
 
-// const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-const geometry = new THREE.BufferGeometry();
-geometry.setAttribute("position", positionsAttribute);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({
-  color: 0xff0000,
-  wireframe: true,
+  color: properties.color,
 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
+
+// add(object , property of object that is updated , minValue, MaxValue, precision)
+// gui.add(mesh.position, "x", -3, 3, 0.01);
+// gui.add(mesh.position, "y", -3, 3, 0.01);
+// gui.add(mesh.position, "z", -3, 3, 0.01);
+
+// or
+gui.add(mesh.position, "x").min(-3).max(3).step(0.1).name("x axis");
+gui.add(mesh.position, "y").min(-3).max(3).step(0.1).name("y axis");
+gui.add(mesh.position, "z").min(-3).max(3).step(0.1).name("z axis");
+gui.add(mesh, "visible");
+gui.add(material, "wireframe");
+gui
+  .addColor(properties, "color")
+  .onChange(() => material.color.set(properties.color));
+
+gui.add(properties, "spin");
 
 const aspectRatio = sizes.width / sizes.height;
 
@@ -51,9 +72,9 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-// camera.position.x = 2;
-// camera.position.y = 2;
+
 camera.position.z = 3;
+console.log(camera.position.length());
 
 // look at the object , focus on object
 camera.lookAt(mesh.position);
@@ -87,6 +108,7 @@ window.addEventListener("resize", (event) => {
 
 // full screen mode - using double click
 window.addEventListener("dblclick", () => {
+  console.log("double click");
   if (!document.fullscreenElement) {
     console.log("Go full screen mode");
     canvas.requestFullscreen();
