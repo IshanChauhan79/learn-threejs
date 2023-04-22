@@ -1,192 +1,227 @@
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import * as dat from "dat.gui";
-import gsap from "gsap";
-// import image from "/door.jpg";
 
-// --------------------------------textures------------------
-//------------ old mathod--------
-// const image = new Image();
-// const texture = new THREE.Texture(image);
-// image.onload = () => {
-//   texture.needsUpdate = true;
+// code start helper ------------------------------------
+
+//  -------------------------------- textures-------------------------------
+
+// --------------------------------- new method ----------------------------
+
+// --------------------------------- Debug ------------------------------------------
+
+// --------------------------------- convas ---------------------------------
+
+// --------------------------------- Sizes---------------------------------
+
+// --------------------------------- cursor--------------------------------------
+
+// --------------------------------- Scene--------------------------------------------------
+
+// --------------------------------- Object - materila, geometry ---------------------------
+
+// --------------------------------- Camera--------------------------
+
+// --------------------------------- controls------------------------------
+
+// --------------------------------- Renderer----------------------------
+
+// --------------------------------- render--------------------------------------
+
+// --------------------------------- resizing of window--------------------------------------
+
+// --------------------------------- full screen mode - using double click--------------------------------
+
+// import "./style.css";
+// import * as THREE from "three";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// import * as dat from "dat.gui";
+// import gsap from "gsap";
+// // import image from "/door.jpg";
+
+// // --------------------------------textures------------------
+// //------------ old mathod--------
+// // const image = new Image();
+// // const texture = new THREE.Texture(image);
+// // image.onload = () => {
+// //   texture.needsUpdate = true;
+// // };
+// // image.src = "/textures/door/color.jpg";
+
+// // --------------------------- new method ----------------------------
+// const loadingManager = new THREE.LoadingManager();
+
+// loadingManager.onStart = () => {
+//   console.log("onStart");
 // };
-// image.src = "/textures/door/color.jpg";
 
-// --------------------------- new method ----------------------------
-const loadingManager = new THREE.LoadingManager();
+// loadingManager.onLoad = () => {
+//   console.log("onLoad");
+// };
+// loadingManager.onProgress = () => {
+//   console.log("onProgress");
+// };
+// loadingManager.onError = () => {
+//   console.log("onError");
+// };
 
-loadingManager.onStart = () => {
-  console.log("onStart");
-};
+// const textureLoader = new THREE.TextureLoader(loadingManager);
+// const colorTexture = textureLoader.load(
+//   "/textures/door/color.jpg"
+//   // () => {
+//   //   console.log("load");
+//   // },
+//   // () => {
+//   //   console.log("progress");
+//   // },
+//   // () => {
+//   //   console.log("error");
+//   // }
+// );
+// // colorTexture.repeat.x = 2;
+// // colorTexture.repeat.y = 3;
+// // colorTexture.wrapS = THREE.RepeatWrapping;
+// // colorTexture.wrapT = THREE.RepeatWrapping;
 
-loadingManager.onLoad = () => {
-  console.log("onLoad");
-};
-loadingManager.onProgress = () => {
-  console.log("onProgress");
-};
-loadingManager.onError = () => {
-  console.log("onError");
-};
+// // colorTexture.wrapS = THREE.MirroredRepeatWrapping;
+// // colorTexture.wrapT = THREE.MirroredRepeatWrapping;
 
-const textureLoader = new THREE.TextureLoader(loadingManager);
-const colorTexture = textureLoader.load(
-  "/textures/door/color.jpg"
-  // () => {
-  //   console.log("load");
-  // },
-  // () => {
-  //   console.log("progress");
-  // },
-  // () => {
-  //   console.log("error");
-  // }
-);
-// colorTexture.repeat.x = 2;
-// colorTexture.repeat.y = 3;
-// colorTexture.wrapS = THREE.RepeatWrapping;
-// colorTexture.wrapT = THREE.RepeatWrapping;
+// // colorTexture.offset.x = 0.5;
+// // colorTexture.offset.y = 0.5;
 
-// colorTexture.wrapS = THREE.MirroredRepeatWrapping;
-// colorTexture.wrapT = THREE.MirroredRepeatWrapping;
+// // colorTexture.rotation = Math.PI / 4;
+// // colorTexture.center.x = 0.5;
+// // colorTexture.center.y = 0.5;
 
-// colorTexture.offset.x = 0.5;
-// colorTexture.offset.y = 0.5;
+// colorTexture.minFilter = THREE.NearestFilter;
+// colorTexture.magFilter = THREE.NearestFilter;
 
-// colorTexture.rotation = Math.PI / 4;
-// colorTexture.center.x = 0.5;
-// colorTexture.center.y = 0.5;
+// const aplhaTexture = textureLoader.load("/textures/door/alpha.jpg");
+// // const checkboard = textureLoader.load("/textures/checkerboard-1024x1024.png");
+// const minecraft = textureLoader.load("/textures/minecraft.png");
+// minecraft.magFilter = THREE.NearestFilter;
+// minecraft.generateMipmaps = false;
 
-colorTexture.minFilter = THREE.NearestFilter;
-colorTexture.magFilter = THREE.NearestFilter;
+// //--------------------------------------- Debug --------------------
+// const gui = new dat.GUI({ closed: true, width: 400 });
 
-const aplhaTexture = textureLoader.load("/textures/door/alpha.jpg");
-// const checkboard = textureLoader.load("/textures/checkerboard-1024x1024.png");
-const minecraft = textureLoader.load("/textures/minecraft.png");
-minecraft.magFilter = THREE.NearestFilter;
-minecraft.generateMipmaps = false;
+// const properties = {
+//   color: 0xff0000,
+//   spin: () =>
+//     gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 }),
+// };
 
-//--------------------------------------- Debug --------------------
-const gui = new dat.GUI({ closed: true, width: 400 });
+// //----------------------------------------- Sizes-------------------
+// const sizes = {
+//   width: window.innerWidth,
+//   height: window.innerHeight,
+// };
 
-const properties = {
-  color: 0xff0000,
-  spin: () =>
-    gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 }),
-};
+// const cursor = {
+//   x: 0,
+//   y: 0,
+// };
 
-//----------------------------------------- Sizes-------------------
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-};
+// ----------------------------------------- convas -------------------------
+// const canvas = document.querySelector("canvas.webgl");
 
-const cursor = {
-  x: 0,
-  y: 0,
-};
+// // -------------------------------------cursor--------------------------------------
+// window.addEventListener("mousemove", (event) => {
+//   cursor.x = event.clientX / sizes.width - 0.5;
+//   cursor.y = -(event.clientY / sizes.height - 0.5);
+// });
 
-const canvas = document.querySelector("canvas.webgl");
+// // -------------------------------------Scene--------------------------------------------------
+// const scene = new THREE.Scene();
 
-// -------------------------------------cursor--------------------------------------
-window.addEventListener("mousemove", (event) => {
-  cursor.x = event.clientX / sizes.width - 0.5;
-  cursor.y = -(event.clientY / sizes.height - 0.5);
-});
+// //-------------------------------------- Object - materila, geometry ---------------------------
 
-// -------------------------------------Scene--------------------------------------------------
-const scene = new THREE.Scene();
+// const geometry = new THREE.BoxGeometry(1, 1, 1);
+// // console.log(geometry.attributes.uv);
+// const material = new THREE.MeshBasicMaterial({
+//   // color: properties.color,
+//   map: minecraft,
+// });
+// const mesh = new THREE.Mesh(geometry, material);
+// scene.add(mesh);
 
-//-------------------------------------- Object - materila, geometry ---------------------------
+// gui.add(mesh.position, "x").min(-3).max(3).step(0.1).name("x axis");
+// gui.add(mesh.position, "y").min(-3).max(3).step(0.1).name("y axis");
+// gui.add(mesh.position, "z").min(-3).max(3).step(0.1).name("z axis");
+// gui.add(mesh, "visible");
+// gui.add(material, "wireframe");
+// gui
+//   .addColor(properties, "color")
+//   .onChange(() => material.color.set(properties.color));
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-// console.log(geometry.attributes.uv);
-const material = new THREE.MeshBasicMaterial({
-  // color: properties.color,
-  map: minecraft,
-});
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+// gui.add(properties, "spin");
 
-gui.add(mesh.position, "x").min(-3).max(3).step(0.1).name("x axis");
-gui.add(mesh.position, "y").min(-3).max(3).step(0.1).name("y axis");
-gui.add(mesh.position, "z").min(-3).max(3).step(0.1).name("z axis");
-gui.add(mesh, "visible");
-gui.add(material, "wireframe");
-gui
-  .addColor(properties, "color")
-  .onChange(() => material.color.set(properties.color));
+// const aspectRatio = sizes.width / sizes.height;
 
-gui.add(properties, "spin");
+// //----------------------------------------- Camera--------------------------
+// const camera = new THREE.PerspectiveCamera(
+//   75,
+//   sizes.width / sizes.height,
+//   0.1,
+//   100
+// );
 
-const aspectRatio = sizes.width / sizes.height;
+// camera.position.z = 3;
+// console.log(camera.position.length());
 
-//----------------------------------------- Camera--------------------------
-const camera = new THREE.PerspectiveCamera(
-  75,
-  sizes.width / sizes.height,
-  0.1,
-  100
-);
+// // look at the object , focus on object
+// camera.lookAt(mesh.position);
+// scene.add(camera);
 
-camera.position.z = 3;
-console.log(camera.position.length());
+// // ------------------------------------ controls------------------------------
+// const controls = new OrbitControls(camera, canvas);
+// controls.enableDamping = true;
 
-// look at the object , focus on object
-camera.lookAt(mesh.position);
-scene.add(camera);
+// // ------------------------------------- Renderer----------------------------
+// const renderer = new THREE.WebGLRenderer({
+//   canvas: canvas,
+// });
 
-// ------------------------------------ controls------------------------------
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+// renderer.setSize(sizes.width, sizes.height);
 
-// ------------------------------------- Renderer----------------------------
-const renderer = new THREE.WebGLRenderer({
-  canvas: canvas,
-});
+// // ------------------------------------ render--------------------------------------
+// renderer.render(scene, camera);
 
-renderer.setSize(sizes.width, sizes.height);
+// // ----------------------------resizing of window--------------------------------------
+// window.addEventListener("resize", (event) => {
+//   sizes.width = window.innerWidth;
+//   sizes.height = window.innerHeight;
+//   // ------------------------update camera-------------------
+//   camera.aspect = sizes.width / sizes.height;
+//   camera.updateProjectionMatrix();
+//   renderer.setSize(sizes.width, sizes.height);
+//   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// });
 
-// ------------------------------------ render--------------------------------------
-renderer.render(scene, camera);
+// //-------------------- full screen mode - using double click--------------------------------
+// window.addEventListener("dblclick", () => {
+//   console.log("double click");
+//   if (!document.fullscreenElement) {
+//     console.log("Go full screen mode");
+//     canvas.requestFullscreen();
+//   } else {
+//     console.log("leave full screen mode");
+//     document.exitFullscreen();
+//   }
+// });
 
-// ----------------------------resizing of window--------------------------------------
-window.addEventListener("resize", (event) => {
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-  // ------------------------update camera-------------------
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
+// // ------------------ animation ---------------------------------------------
+// const clock = new THREE.Clock();
+// const tick = () => {
+//   const elapsedTime = clock.getElapsedTime();
+//   //   update controls for damping
+//   controls.update();
 
-//-------------------- full screen mode - using double click--------------------------------
-window.addEventListener("dblclick", () => {
-  console.log("double click");
-  if (!document.fullscreenElement) {
-    console.log("Go full screen mode");
-    canvas.requestFullscreen();
-  } else {
-    console.log("leave full screen mode");
-    document.exitFullscreen();
-  }
-});
+//   renderer.render(scene, camera);
 
-// ------------------ animation ---------------------------------------------
-const clock = new THREE.Clock();
-const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
-  //   update controls for damping
-  controls.update();
-
-  renderer.render(scene, camera);
-
-  window.requestAnimationFrame(tick);
-};
-tick();
+//   window.requestAnimationFrame(tick);
+// };
+// tick();
 
 // ------------------------- datgui--------
 // add(object , property of object that is updated , minValue, MaxValue, precision)
@@ -425,3 +460,33 @@ tick();
 
 // }
 // tick()
+
+// code start helper ------------------------------------
+
+//  -------------------------------- textures-------------------------------
+
+// --------------------------------- new method ----------------------------
+
+// --------------------------------- Debug ------------------------------------------
+
+// --------------------------------- convas -----------------------------------
+
+// --------------------------------- Sizes----------------------------------
+
+// --------------------------------- cursor--------------------------------------
+
+// --------------------------------- Scene--------------------------------------------------
+
+// --------------------------------- Object - materila, geometry ---------------------------
+
+// --------------------------------- Camera--------------------------------
+
+// --------------------------------- controls------------------------------
+
+// --------------------------------- Renderer------------------------------
+
+// --------------------------------- render--------------------------------------
+
+// --------------------------------- resizing of window--------------------------------------
+
+// --------------------------------- full screen mode - using double click--------------------------------
