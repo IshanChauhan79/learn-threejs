@@ -3,8 +3,72 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "dat.gui";
 import gsap from "gsap";
+// import image from "/door.jpg";
 
-// Debug --------
+// --------------------------------textures------------------
+//------------ old mathod--------
+// const image = new Image();
+// const texture = new THREE.Texture(image);
+// image.onload = () => {
+//   texture.needsUpdate = true;
+// };
+// image.src = "/textures/door/color.jpg";
+
+// --------------------------- new method ----------------------------
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onStart = () => {
+  console.log("onStart");
+};
+
+loadingManager.onLoad = () => {
+  console.log("onLoad");
+};
+loadingManager.onProgress = () => {
+  console.log("onProgress");
+};
+loadingManager.onError = () => {
+  console.log("onError");
+};
+
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const colorTexture = textureLoader.load(
+  "/textures/door/color.jpg"
+  // () => {
+  //   console.log("load");
+  // },
+  // () => {
+  //   console.log("progress");
+  // },
+  // () => {
+  //   console.log("error");
+  // }
+);
+// colorTexture.repeat.x = 2;
+// colorTexture.repeat.y = 3;
+// colorTexture.wrapS = THREE.RepeatWrapping;
+// colorTexture.wrapT = THREE.RepeatWrapping;
+
+// colorTexture.wrapS = THREE.MirroredRepeatWrapping;
+// colorTexture.wrapT = THREE.MirroredRepeatWrapping;
+
+// colorTexture.offset.x = 0.5;
+// colorTexture.offset.y = 0.5;
+
+// colorTexture.rotation = Math.PI / 4;
+// colorTexture.center.x = 0.5;
+// colorTexture.center.y = 0.5;
+
+colorTexture.minFilter = THREE.NearestFilter;
+colorTexture.magFilter = THREE.NearestFilter;
+
+const aplhaTexture = textureLoader.load("/textures/door/alpha.jpg");
+// const checkboard = textureLoader.load("/textures/checkerboard-1024x1024.png");
+const minecraft = textureLoader.load("/textures/minecraft.png");
+minecraft.magFilter = THREE.NearestFilter;
+minecraft.generateMipmaps = false;
+
+//--------------------------------------- Debug --------------------
 const gui = new dat.GUI({ closed: true, width: 400 });
 
 const properties = {
@@ -13,9 +77,7 @@ const properties = {
     gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 }),
 };
 
-console.log(gui);
-
-// Sizes
+//----------------------------------------- Sizes-------------------
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -28,30 +90,26 @@ const cursor = {
 
 const canvas = document.querySelector("canvas.webgl");
 
-// cursor
+// -------------------------------------cursor--------------------------------------
 window.addEventListener("mousemove", (event) => {
   cursor.x = event.clientX / sizes.width - 0.5;
   cursor.y = -(event.clientY / sizes.height - 0.5);
 });
 
-// Scene
+// -------------------------------------Scene--------------------------------------------------
 const scene = new THREE.Scene();
 
-// Object
+//-------------------------------------- Object - materila, geometry ---------------------------
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
+// console.log(geometry.attributes.uv);
 const material = new THREE.MeshBasicMaterial({
-  color: properties.color,
+  // color: properties.color,
+  map: minecraft,
 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-// add(object , property of object that is updated , minValue, MaxValue, precision)
-// gui.add(mesh.position, "x", -3, 3, 0.01);
-// gui.add(mesh.position, "y", -3, 3, 0.01);
-// gui.add(mesh.position, "z", -3, 3, 0.01);
-
-// or
 gui.add(mesh.position, "x").min(-3).max(3).step(0.1).name("x axis");
 gui.add(mesh.position, "y").min(-3).max(3).step(0.1).name("y axis");
 gui.add(mesh.position, "z").min(-3).max(3).step(0.1).name("z axis");
@@ -65,7 +123,7 @@ gui.add(properties, "spin");
 
 const aspectRatio = sizes.width / sizes.height;
 
-// Camera
+//----------------------------------------- Camera--------------------------
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
@@ -78,35 +136,34 @@ console.log(camera.position.length());
 
 // look at the object , focus on object
 camera.lookAt(mesh.position);
-
 scene.add(camera);
 
-// controls
+// ------------------------------------ controls------------------------------
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
-// Renderer
+// ------------------------------------- Renderer----------------------------
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
 
 renderer.setSize(sizes.width, sizes.height);
 
-// render
+// ------------------------------------ render--------------------------------------
 renderer.render(scene, camera);
 
-// resizing of window
+// ----------------------------resizing of window--------------------------------------
 window.addEventListener("resize", (event) => {
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
-  //   update camera
+  // ------------------------update camera-------------------
   camera.aspect = sizes.width / sizes.height;
   camera.updateProjectionMatrix();
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-// full screen mode - using double click
+//-------------------- full screen mode - using double click--------------------------------
 window.addEventListener("dblclick", () => {
   console.log("double click");
   if (!document.fullscreenElement) {
@@ -118,11 +175,10 @@ window.addEventListener("dblclick", () => {
   }
 });
 
+// ------------------ animation ---------------------------------------------
 const clock = new THREE.Clock();
-
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
-
   //   update controls for damping
   controls.update();
 
@@ -131,6 +187,24 @@ const tick = () => {
   window.requestAnimationFrame(tick);
 };
 tick();
+
+// ------------------------- datgui--------
+// add(object , property of object that is updated , minValue, MaxValue, precision)
+// gui.add(mesh.position, "x", -3, 3, 0.01);
+// gui.add(mesh.position, "y", -3, 3, 0.01);
+// gui.add(mesh.position, "z", -3, 3, 0.01);
+
+// or
+// gui.add(mesh.position, "x").min(-3).max(3).step(0.1).name("x axis");
+// gui.add(mesh.position, "y").min(-3).max(3).step(0.1).name("y axis");
+// gui.add(mesh.position, "z").min(-3).max(3).step(0.1).name("z axis");
+// gui.add(mesh, "visible");
+// gui.add(material, "wireframe");
+// gui
+//   .addColor(properties, "color")
+//   .onChange(() => material.color.set(properties.color));
+
+// gui.add(properties, "spin");
 
 //  -------------------------------------- camera , animation , controls ,  -------------
 
