@@ -1,13 +1,15 @@
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { MMDLoader } from "three/examples/jsm/loaders/MMDLoader.js";
+
 import * as dat from "dat.gui";
 
 /**
  * Base
  */
 // Debug
-const gui = new dat.GUI({ width: 400 });
+const gui = new dat.GUI({ width: 400, closed: true });
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
@@ -27,6 +29,32 @@ const scene = new THREE.Scene();
 /**
  * galaxy
  */
+
+var loader = new MMDLoader();
+loader.load("/models/Crow/Crow_Apose.pmx", function (mesh) {
+  mesh.scale.set(0.25, 0.25, 0.25);
+  mesh.traverse(function (child) {
+    if (child instanceof THREE.Mesh) {
+      if (child.material) {
+        // Check material properties, such as color, map, etc.
+        console.log(child.material);
+        child.material.map.minFilter = THREE.NearestFilter;
+        child.material.map.magFilter = THREE.NearestFilter;
+        child.material.emissive = new THREE.Color(0x000000);
+        child.material.specular = new THREE.Color(0x111111);
+      }
+    }
+  });
+  scene.add(mesh);
+  console.log(mesh);
+});
+
+var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+directionalLight.position.set(0, 1, 0);
+scene.add(directionalLight);
 
 const parameters = {};
 parameters.count = 100000;
@@ -231,6 +259,7 @@ controls.enableDamping = true;
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
+renderer.gammaOutput = true;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
