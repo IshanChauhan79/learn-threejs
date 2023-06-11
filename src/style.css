@@ -1,23 +1,19 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*
+{
+    margin: 0;
+    padding: 0;
 }
 
-body {
-  font-family: amiko-font, sans-serif, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 1.6rem;
-  margin: 0;
-  /* overflow: hidden; */
-  /* min-width: 35rem; */
+html,
+body
+{
+    overflow: hidden;
 }
 
-.webgl {
-  position: fixed;
-  inset: 0;
-  outline: none;
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
 }
