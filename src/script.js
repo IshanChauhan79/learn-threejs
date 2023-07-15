@@ -1,233 +1,205 @@
-import "./style.css";
+import "/style.css";
 import * as THREE from "three";
+
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "dat.gui";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
-import { GroundProjectedEnv } from "three/examples/jsm/objects/GroundProjectedEnv";
+// Start of the code
+THREE.ColorManagement.enabled = true;
 
-THREE.ColorManagement.enabled = false;
 /**
  * Loaders
  */
-
-const gltfLoader = new GLTFLoader();
-const cubeTextLoader = new THREE.CubeTextureLoader();
-const rgbeLoader = new RGBELoader();
-const exrLoader = new EXRLoader();
 const textureLoader = new THREE.TextureLoader();
+const gltfLoader = new GLTFLoader();
+const rgbeLoader = new RGBELoader();
 
 /**
  * Base
  */
 // Debug
 const gui = new dat.GUI();
-const debugObject = { envMapIntensity: 3 };
+const global = {};
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
-scene.backgroundBlurriness = 0;
-scene.backgroundIntensity = 1;
-
-gui.add(scene, "backgroundBlurriness").min(0).max(1).step(0.01);
-//   .onChange(updateAllMaterials);
-
-gui.add(scene, "backgroundIntensity").min(0).max(10).step(0.01);
-//   .onChange(updateAllMaterials);
 
 /**
- * update all materials
+ * Update all materials
  */
-
 const updateAllMaterials = () => {
   scene.traverse((child) => {
-    // child.update();
-    if (
-      child.isMesh &&
-      child.material.isMeshStandardMaterial
-      //   child instanceof THREE.Mesh &&
-      //   child.material instanceof THREE.MeshStandardMaterial
-    ) {
-      // child.material.envMap = environmentMap;
-      child.material.envMapIntensity = debugObject.envMapIntensity;
+    if (child.isMesh && child.material.isMeshStandardMaterial) {
+      child.material.envMapIntensity = global.envMapIntensity;
+      child.castShadow = true;
+      child.receiveShadow = true;
     }
   });
 };
 
 /**
- * Textures
+ * Environment map
  */
-
-// const environmentMap = cubeTextLoader.load([
-//   "/textures/environmentMaps/0/px.png",
-//   "/textures/environmentMaps/0/nx.png",
-//   "/textures/environmentMaps/0/py.png",
-//   "/textures/environmentMaps/0/ny.png",
-//   "/textures/environmentMaps/0/pz.png",
-//   "/textures/environmentMaps/0/nz.png",
-// ]);
-
-// scene.background = environmentMap;
-// scene.environment = environmentMap;
-
-// hdr (RGBE equirectangular)
-// rgbeLoader.load(
-//   "/textures/environmentMaps/blender-2k.hdr",
-//   (environmentMap) => {
-//     console.log(environmentMap);
-//     environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-//     // scene.background = environmentMap;
-//     scene.environment = environmentMap;
-//   }
-// );
-
-// hdr - exr loader - equirectangular
-// exrLoader.load(
-//   "/textures/environmentMaps/nvidiaCanvas-4k.exr",
-//   (environmentMap) => {
-//     console.log(environmentMap);
-//     environmentMap.minFilter = THREE.LinearFilter;
-//     environmentMap.magFilter = THREE.LinearFilter;
-//     environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-//     scene.background = environmentMap;
-//     scene.environment = environmentMap;
-//   }
-// );
-
-//  ai generated maps
-
-// const environmentMap = textureLoader.load(
-//   "/textures/environmentMaps/blockadesLabsSkybox/anime_1_demon_fighting_1_swordsmen_at_night_near_s.jpg"
-// );
-// environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-// environmentMap.colorSpace = THREE.SRGBColorSpace;
-
-// console.log(environmentMap);
-// scene.background = environmentMap;
-// scene.environment = environmentMap;
-
-// rgbeLoader.load("/textures/environmentMaps/2/2k.hdr", (environmentMap) => {
-//   environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-//   // scene.background = environmentMap;
-//   scene.environment = environmentMap;
-
-//   const skyBox = new GroundProjectedEnv(environmentMap);
-//   skyBox.scale.setScalar(50);
-//   scene.add(skyBox);
-
-//   gui.add(skyBox, "radius").min(1).max(200).step(0.01).name("skybox radius");
-//   gui.add(skyBox, "height").min(1).max(200).step(0.01).name("skybox height");
-//   // .onChange(updateAllMaterials);
-// });
-
-//  real time environment + animation
-
-const environmentMap = textureLoader.load(
-  "/textures/environmentMaps/blockadesLabsSkybox/anime_1_demon_fighting_1_swordsmen_at_night_near_s.jpg"
-);
-environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-environmentMap.colorSpace = THREE.SRGBColorSpace;
-
-scene.background = environmentMap;
-// scene.environment = environmentMap;
-
+// Global intensity
+global.envMapIntensity = 1;
 gui
-  .add(debugObject, "envMapIntensity")
+  .add(global, "envMapIntensity")
   .min(0)
   .max(10)
-  .step(0.01)
+  .step(0.001)
   .onChange(updateAllMaterials);
 
-/**
- * holy donut
- */
-
-const holyDonut = new THREE.Mesh(
-  new THREE.TorusGeometry(8, 0.5),
-  new THREE.MeshBasicMaterial({
-    color: new THREE.Color(10, 10, 10),
-    // color: new THREE.Color(10, 4, 2),
-  })
-);
-holyDonut.position.y = 4;
-holyDonut.position.x = -1.5;
-
-scene.add(holyDonut);
-
-// cube render target
-const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
-  type: THREE.HalfFloatType,
+// HDR (RGBE) equirectangular
+rgbeLoader.load("/textures/environmentMaps/0/2k.hdr", (environmentMap) => {
+  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+  scene.background = environmentMap;
+  scene.environment = environmentMap;
 });
 
-scene.environment = cubeRenderTarget.texture;
-
-const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRenderTarget);
-cubeCamera.layers.set(1);
-holyDonut.layers.enable(1);
-// scene.add(cubeCamera);
-
 /**
- * Torus Knot
+ * Models
  */
-const torusKnot = new THREE.Mesh(
-  new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
-  new THREE.MeshStandardMaterial({
-    roughness: 0,
-    metalness: 1,
-    color: 0x616060,
-  })
-);
+// Helmet
+// gltfLoader.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", (gltf) => {
+//   gltf.scene.scale.set(10, 10, 10);
+//   scene.add(gltf.scene);
 
-torusKnot.position.x = -4;
-torusKnot.position.y = 4;
-scene.add(torusKnot);
+//   updateAllMaterials();
+// });
 
-/**
- * models
- */
-
-gltfLoader.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", (gltf) => {
-  //   console.log("success", gltf);
-  gltf.scene.scale.set(10, 10, 10);
-  //   gltf.scene.position.set(0, -4, 0);
-  //   gltf.scene.rotation.y = Math.PI * 0.5;
+// hamburgur
+gltfLoader.load("/models/hamburger.glb", (gltf) => {
+  gltf.scene.scale.set(0.6, 0.6, 0.6);
   scene.add(gltf.scene);
-
-  gui
-    .add(gltf.scene.rotation, "y")
-    .min(-Math.PI)
-    .max(Math.PI)
-    .step(0.01)
-    .name("gltf roation y");
 
   updateAllMaterials();
 });
 
 /**
+ * textures
+ */
+
+const floorColorTexture = textureLoader.load(
+  "/textures/wood_cabinet_worn_long/wood_cabinet_worn_long_diff_1k.jpg"
+);
+floorColorTexture.colorSpace = THREE.SRGBColorSpace;
+const floorNormalTexture = textureLoader.load(
+  "/textures/wood_cabinet_worn_long/wood_cabinet_worn_long_nor_gl_1k.png"
+);
+const floorARMTexture = textureLoader.load(
+  "/textures/wood_cabinet_worn_long/wood_cabinet_worn_long_arm_1k.jpg"
+);
+
+const wallsColorTexture = textureLoader.load(
+  "/textures/castle_brick_broken_06/castle_brick_broken_06_diff_1k.jpg"
+);
+wallsColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const wallsNormalTexture = textureLoader.load(
+  "/textures/castle_brick_broken_06/castle_brick_broken_06_nor_gl_1k.png"
+);
+const wallsARMTexture = textureLoader.load(
+  "/textures/castle_brick_broken_06/castle_brick_broken_06_arm_1k.jpg"
+);
+
+/**
+ * geometry
+ */
+
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({
+    map: floorColorTexture,
+    normalMap: floorNormalTexture,
+    aoMap: floorARMTexture,
+    metalnessMap: floorARMTexture,
+    roughnessMap: floorARMTexture,
+  })
+);
+
+floor.rotation.x = -Math.PI * 0.5;
+floor.receiveShadow = true;
+
+scene.add(floor);
+
+const walls = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({
+    map: wallsColorTexture,
+    normalMap: wallsNormalTexture,
+    aoMap: wallsARMTexture,
+    metalnessMap: wallsARMTexture,
+    roughnessMap: wallsARMTexture,
+  })
+);
+walls.receiveShadow = true;
+walls.position.z = -10;
+walls.position.y = 10;
+
+scene.add(walls);
+
+/**
  * Lightes
  */
 
-// const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-// directionalLight.position.set(0.25, 3, -2.25);
-// scene.add(directionalLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight.position.set(-4, 6.5, 2.55);
 
-// gui
-//   .add(directionalLight, "intensity")
-//   .min(0)
-//   .max(10)
-//   .step(0.1)
-//   .name("lightIntensity");
+scene.add(directionalLight);
 
-// gui.add(directionalLight.position, "x").min(-5).max(5).step(0.1).name("lightX");
+gui.add(directionalLight, "castShadow");
+gui
+  .add(directionalLight, "intensity")
+  .min(0)
+  .max(10)
+  .step(0.1)
+  .name("lightIntensity");
 
-// gui.add(directionalLight.position, "y").min(-5).max(5).step(0.1).name("lightY");
+gui
+  .add(directionalLight.position, "x")
+  .min(-10)
+  .max(10)
+  .step(0.1)
+  .name("lightX");
+gui
+  .add(directionalLight.position, "y")
+  .min(-10)
+  .max(10)
+  .step(0.1)
+  .name("lightY");
+gui
+  .add(directionalLight.position, "z")
+  .min(-10)
+  .max(10)
+  .step(0.1)
+  .name("lightZ");
 
-// gui.add(directionalLight.position, "z").min(-5).max(5).step(0.1).name("lightZ");
+// helpers -----
+// const directionalLightHelper = new THREE.DirectionalLightHelper(
+//   directionalLight
+// );
+// const directionalLightCameraHelper = new THREE.CameraHelper(
+//   directionalLight.shadow.camera
+// );
+// scene.add(directionalLightHelper);
+// scene.add(directionalLightCameraHelper);
+
+// shadows
+directionalLight.castShadow = true;
+directionalLight.shadow.camera.far = 20;
+directionalLight.shadow.mapSize.set(1024, 1024);
+directionalLight.target.position.set(0, 4, 0);
+scene.add(directionalLight.target);
+directionalLight.shadow.normalBias = 0.027;
+directionalLight.shadow.bias = -0.004;
+
+gui.add(directionalLight.shadow, "normalBias").min(-0.05).max(0.05).step(0.001);
+gui.add(directionalLight.shadow, "bias").min(-0.05).max(0.05).step(0.001);
 
 /**
  * Sizes
@@ -261,7 +233,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(4, 5, 7);
+camera.position.set(4, 5, 4);
 scene.add(camera);
 
 // Controls
@@ -274,25 +246,39 @@ controls.enableDamping = true;
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
+  antialias: true,
 });
-renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+renderer.toneMapping = THREE.ReinhardToneMapping;
+renderer.toneMappingExposure = 3;
+
+gui.add(renderer, "toneMapping", {
+  no: THREE.NoToneMapping,
+  aces: THREE.ACESFilmicToneMapping,
+  linear: THREE.LinearToneMapping,
+  Cineon: THREE.CineonToneMapping,
+  Reinhard: THREE.ReinhardToneMapping,
+});
+
+gui.add(renderer, "toneMappingExposure").min(0).max(10).step(0.01);
+
+// After instantiating the renderer
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+// renderer.outputEncoding = THREE.sRGBEncoding;
+
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// physically correct lights
+renderer.useLegacyLights = false;
+gui.add(renderer, "useLegacyLights");
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 /**
  * Animate
  */
-const clock = new THREE.Clock();
 const tick = () => {
-  // Time
-  const elapsedTime = clock.getElapsedTime();
-
-  // rotate holy donut
-  if (holyDonut) {
-    holyDonut.rotation.x = Math.sin(elapsedTime) * 2;
-    cubeCamera.update(renderer, scene);
-  }
-
   // Update controls
   controls.update();
 
