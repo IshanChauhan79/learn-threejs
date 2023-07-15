@@ -111,19 +111,30 @@ const updateAllMaterials = () => {
 // scene.background = environmentMap;
 // scene.environment = environmentMap;
 
-rgbeLoader.load("/textures/environmentMaps/2/2k.hdr", (environmentMap) => {
-  environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-  // scene.background = environmentMap;
-  scene.environment = environmentMap;
+// rgbeLoader.load("/textures/environmentMaps/2/2k.hdr", (environmentMap) => {
+//   environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+//   // scene.background = environmentMap;
+//   scene.environment = environmentMap;
 
-  const skyBox = new GroundProjectedEnv(environmentMap);
-  skyBox.scale.setScalar(50);
-  scene.add(skyBox);
+//   const skyBox = new GroundProjectedEnv(environmentMap);
+//   skyBox.scale.setScalar(50);
+//   scene.add(skyBox);
 
-  gui.add(skyBox, "radius").min(1).max(200).step(0.01).name("skybox radius");
-  gui.add(skyBox, "height").min(1).max(200).step(0.01).name("skybox height");
-  // .onChange(updateAllMaterials);
-});
+//   gui.add(skyBox, "radius").min(1).max(200).step(0.01).name("skybox radius");
+//   gui.add(skyBox, "height").min(1).max(200).step(0.01).name("skybox height");
+//   // .onChange(updateAllMaterials);
+// });
+
+//  real time environment + animation
+
+const environmentMap = textureLoader.load(
+  "/textures/environmentMaps/blockadesLabsSkybox/anime_1_demon_fighting_1_swordsmen_at_night_near_s.jpg"
+);
+environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+environmentMap.colorSpace = THREE.SRGBColorSpace;
+
+scene.background = environmentMap;
+// scene.environment = environmentMap;
 
 gui
   .add(debugObject, "envMapIntensity")
@@ -133,11 +144,43 @@ gui
   .onChange(updateAllMaterials);
 
 /**
+ * holy donut
+ */
+
+const holyDonut = new THREE.Mesh(
+  new THREE.TorusGeometry(8, 0.5),
+  new THREE.MeshBasicMaterial({
+    color: new THREE.Color(10, 10, 10),
+    // color: new THREE.Color(10, 4, 2),
+  })
+);
+holyDonut.position.y = 4;
+holyDonut.position.x = -1.5;
+
+scene.add(holyDonut);
+
+// cube render target
+const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+  type: THREE.HalfFloatType,
+});
+
+scene.environment = cubeRenderTarget.texture;
+
+const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRenderTarget);
+cubeCamera.layers.set(1);
+holyDonut.layers.enable(1);
+// scene.add(cubeCamera);
+
+/**
  * Torus Knot
  */
 const torusKnot = new THREE.Mesh(
   new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
-  new THREE.MeshStandardMaterial()
+  new THREE.MeshStandardMaterial({
+    roughness: 0,
+    metalness: 1,
+    color: 0x616060,
+  })
 );
 
 torusKnot.position.x = -4;
@@ -243,6 +286,12 @@ const clock = new THREE.Clock();
 const tick = () => {
   // Time
   const elapsedTime = clock.getElapsedTime();
+
+  // rotate holy donut
+  if (holyDonut) {
+    holyDonut.rotation.x = Math.sin(elapsedTime) * 2;
+    cubeCamera.update(renderer, scene);
+  }
 
   // Update controls
   controls.update();
